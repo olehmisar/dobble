@@ -1,15 +1,26 @@
-import { writable } from "svelte/store";
-import { generate } from "./dobble-algo";
 import { sha256 } from "hash.js";
 import _ from "lodash";
+import { get, readable } from "svelte/store";
+import * as typesaurus from "typesaurus";
+import { db } from "./db";
+import { generate } from "./dobble-algo";
+import { iife } from "./utils";
 
-const _s = writable<{
-  players: Record<string, Player>;
+type GameStateWaiting = {
+  tag: "waiting";
+  playerIds: Record<string, boolean>;
+};
+type GameStateInProgress = {
+  tag: "inProgress";
+  players: Record<string, PlayerData>;
   remainingCards: Card[];
-}>({
-  players: {},
-  remainingCards: [],
-});
+};
+export type GameState = GameStateWaiting | GameStateInProgress;
+
+const INITIAL_STATE: GameState = {
+  tag: "waiting",
+  playerIds: {},
+};
 
 type Pic = number;
 
@@ -18,59 +29,91 @@ export type Card = {
   pics: Pic[];
 };
 
-type Player = {
-  name: string;
+type PlayerData = {
+  playerId: string;
   cards: Card[];
   lastMoveWasWrong: boolean;
 };
 
 type Move = {
-  player: string;
+  playerId: string;
   selectedPic: Pic;
 };
 
-export const gameState = {
-  subscribe: _s.subscribe,
-  startGame(playerNames: string[]) {
-    const cards = generate(4).map((pics) => ({
-      id: sha256().update(pics.join()).digest("hex"),
-      pics,
-    }));
-    const players: Record<string, Player> = {};
-    for (let i = 0; i < playerNames.length; i++) {
-      players[playerNames[i]] = {
-        name: playerNames[i],
-        cards: [cards.pop()!],
-        lastMoveWasWrong: false,
-      };
+export function getGameState(gameId: string, playerId: string) {
+  typesaurus.get(db.games, gameId).then((doc) => {
+    if (doc) {
+      return;
     }
-    _s.set({
-      players,
-      remainingCards: cards,
-    });
-  },
-  doMove(move: Move) {
-    _s.update((s) => {
-      if (s.players[move.player].lastMoveWasWrong) {
-        return s;
+    typesaurus.set(db.games, gameId, INITIAL_STATE);
+  });
+
+  const _s = readable(INITIAL_STATE, (set) => {
+    typesaurus.onGet(db.games, gameId, (doc) => doc && set(doc.data));
+  });
+  return {
+    subscribe: _s.subscribe,
+    async startGame(playerIds: Record<string, boolean>) {
+      const cards = generate(4).map((pics) => ({
+        id: sha256().update(pics.join()).digest("hex"),
+        pics,
+      }));
+      const players = _(playerIds)
+        .toPairs()
+        .filter(([, joined]) => joined)
+        .map(([playerId]) => ({
+          playerId,
+          cards: [cards.pop()!],
+          lastMoveWasWrong: false,
+        }))
+        .keyBy(({ playerId }) => playerId)
+        .value();
+      await typesaurus.set(db.games, gameId, {
+        tag: "inProgress",
+        players,
+        remainingCards: cards,
+      });
+    },
+    async joinGame(playerId: string) {
+      if (get(_s).tag !== "waiting") {
+        return;
+      }
+      await typesaurus.update<GameStateWaiting>(db.games, gameId, [
+        typesaurus.field(["playerIds", playerId], true),
+      ]);
+    },
+    async doMove(move: Move) {
+      const s = get(_s);
+      if (s.tag !== "inProgress") {
+        return;
+      }
+      const player = s.players[move.playerId];
+      if (!player || player.lastMoveWasWrong) {
+        return;
       }
       const topDeckCard = _.last(s.remainingCards);
       if (!topDeckCard || !cardContainsPic(topDeckCard, move.selectedPic)) {
         return s;
       }
-      const topPlayerCard = _.last(s.players[move.player].cards)!;
-      if (!cardContainsPic(topPlayerCard, move.selectedPic)) {
-        s.players[move.player].lastMoveWasWrong = true;
-        return s;
-      }
-      s.players[move.player].cards.push(s.remainingCards.pop()!);
-      Object.values(s.players).forEach((player) => {
-        player.lastMoveWasWrong = false;
-      });
-      return s;
-    });
-  },
-};
+      await typesaurus.update(
+        db.games,
+        gameId,
+        iife(() => {
+          const topPlayerCard = _.last(player.cards)!;
+          if (!cardContainsPic(topPlayerCard, move.selectedPic)) {
+            s.players[move.playerId]!.lastMoveWasWrong = true;
+            return s;
+          }
+          s.players[move.playerId]!.cards.push(s.remainingCards.pop()!);
+          Object.values(s.players).forEach((player) => {
+            player.lastMoveWasWrong = false;
+          });
+          return s;
+        })
+      );
+    },
+  };
+}
 
 function cardContainsPic(card: Card, pic: Pic) {
   return card.pics.some((p) => p === pic);

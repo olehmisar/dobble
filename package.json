@@ -14,6 +14,7 @@
     "@rollup/plugin-typescript": "^8.0.0",
     "@tsconfig/svelte": "^2.0.0",
     "@types/lodash": "^4.14.175",
+    "firebase": "^8.10.0",
     "hash.js": "^1.1.7",
     "lodash": "^4.17.21",
     "rollup": "^2.3.4",
@@ -26,6 +27,7 @@
     "svelte-check": "^2.0.0",
     "svelte-preprocess": "^4.0.0",
     "tslib": "^2.0.0",
+    "typesaurus": "^7.2.0",
     "typescript": "^4.0.0"
   }
 }

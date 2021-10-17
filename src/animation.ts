@@ -18,4 +18,4 @@ const [send, receive] = crossfade({
     };
   },
 });
-export const moveAnimation = { send, receive };
+export const moveAnimation = { send: send!, receive: receive! };
