@@ -134,7 +134,7 @@
     </div>
 
     <div class="center">
-      <div class="deck" style="--size: 120px">
+      <div class="deck" style="--size: 240px">
         {#each myCards as card}
           <div
             class="card-wrapper"
