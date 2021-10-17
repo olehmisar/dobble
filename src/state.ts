@@ -102,6 +102,15 @@ export function getGameState(gameId: string, playerId: string) {
           const topPlayerCard = _.last(player.cards)!;
           if (!cardContainsPic(topPlayerCard, move.selectedPic)) {
             s.players[move.playerId]!.lastMoveWasWrong = true;
+            if (
+              Object.values(s.players)
+                .map((player) => player.lastMoveWasWrong)
+                .every((wrong) => wrong)
+            ) {
+              Object.values(s.players).forEach((player) => {
+                player.lastMoveWasWrong = false;
+              });
+            }
             return s;
           }
           s.players[move.playerId]!.cards.push(s.remainingCards.pop()!);
