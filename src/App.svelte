@@ -30,7 +30,9 @@
         showUsernameForm = false;
       }}
     />
-  {:else}
+  {/if}
+
+  {#if $username}
     <Router>
       <Route path="/play/:gameId" let:params>
         <Game gameId={params.gameId || ""} />
