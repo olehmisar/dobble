@@ -2,7 +2,7 @@
   import { moveAnimation } from "./animation";
   import Card from "./Card.svelte";
   import { getGameState } from "./state";
-  import { playerId } from "./user-store";
+  import { fetchUsernames, playerId, playerId2Username } from "./user-store";
   import _ from "lodash";
 
   export let gameId: string;
@@ -13,6 +13,9 @@
   ];
 
   $: gameState = getGameState(gameId);
+  $: {
+    fetchUsernames(Object.keys($gameState.players));
+  }
   $: myCards =
     ($gameState.tag !== "waiting" &&
       $playerId &&
@@ -22,10 +25,10 @@
 
 {#if $gameState.tag === "waiting"}
   <p>Waiting...</p>
-  {#each Object.entries($gameState.playerIds)
+  {#each Object.entries($gameState.players)
     .filter(([, joined]) => joined)
-    .map(([id]) => id) as id}
-    <p>{id}</p>
+    .map(([playerId]) => playerId) as playerId}
+    <p>{$playerId2Username[playerId]}</p>
   {/each}
   <button
     on:click={() => {
@@ -42,13 +45,13 @@
       if ($gameState.tag !== "waiting") {
         return;
       }
-      gameState.startGame($gameState.playerIds);
+      gameState.startGame($gameState.players);
     }}>Start game</button
   >
 {:else}
   {#if $gameState.tag === "finished"}
     <p>
-      Winner: {$gameState.winnerId}
+      Winner: {$playerId2Username[$gameState.winnerId]}
       <button
         on:click={() => {
           if ($gameState.tag !== "finished") {
@@ -67,7 +70,7 @@
         .orderBy((p) => p.playerId)
         .value() as player}
         <div class="center">
-          {player.playerId}
+          {$playerId2Username[player.playerId]}
           <div class="deck" style="--size: 60px;">
             {#each player.cards as card}
               <div

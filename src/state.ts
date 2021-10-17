@@ -8,7 +8,7 @@ import { iife } from "./utils";
 
 type GameStateWaiting = {
   tag: "waiting";
-  playerIds: Record<string, boolean>;
+  players: Record<string, boolean>;
 };
 type GameStateInProgress = {
   tag: "inProgress";
@@ -28,7 +28,7 @@ export type GameState =
 
 const INITIAL_STATE: GameState = {
   tag: "waiting",
-  playerIds: {},
+  players: {},
 };
 
 type Pic = number;
@@ -88,7 +88,7 @@ export function getGameState(gameId: string) {
         return;
       }
       await typesaurus.update<GameStateWaiting>(db.games, gameId, [
-        typesaurus.field(["playerIds", playerId], true),
+        typesaurus.field(["players", playerId], true),
       ]);
     },
     async doMove(move: Move) {

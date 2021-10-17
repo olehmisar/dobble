@@ -12,6 +12,11 @@ firebase.initializeApp({
   appId: "1:914218216804:web:e3d1a4f9a8daf7498a9e71",
 });
 
+type Player = {
+  username: string;
+};
+
 export const db = {
+  players: typesaurus.collection<Player>("players"),
   games: typesaurus.collection<GameState>("games"),
 };
