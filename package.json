@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "yarn run check && vite build",
-    "deploy": "cp ./dist/index.html ./dist/200.html && surge ./dist dobble-spotit.surge.sh",
+    "deploy": "cp ./dist/index.html ./dist/200.html && surge ./dist dobble-game.surge.sh",
     "dev": "vite",
     "serve": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"
