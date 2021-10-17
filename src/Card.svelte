@@ -10,7 +10,7 @@
   const dispatch = createEventDispatcher<{ move: number }>();
 </script>
 
-<div class="card">
+<div class="card" class:disabled>
   {#each pics as pic, i}
     <Pic
       x={`${template[i].x}%`}
@@ -33,5 +33,9 @@
     position: relative;
     background: white;
     user-select: none;
+  }
+
+  .card.disabled {
+    background: gray;
   }
 </style>

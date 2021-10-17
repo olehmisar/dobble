@@ -63,7 +63,7 @@
     </p>
   {/if}
   <div class="game">
-    <div style="display: flex; justify-content: space-around">
+    <div style="display: flex; justify-content: space-around; gap: 1rem;">
       {#each _($gameState.players)
         .values()
         .filter((p) => p.playerId !== $playerId)
@@ -136,11 +136,12 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 30px;
+    gap: 2rem;
     align-items: center;
     background: #387d44;
     border: 20px solid #6f4f38;
     border-radius: 100px;
+    padding: 1rem;
   }
 
   .deck {
