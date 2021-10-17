@@ -1,10 +1,9 @@
-import { sha256 } from "hash.js";
 import _ from "lodash";
 import { get, readable } from "svelte/store";
 import * as typesaurus from "typesaurus";
 import { db } from "../db";
 import { generate } from "../shared/dobble-algo";
-import { iife } from "../shared/utils";
+import { iife, sha256 } from "../shared/utils";
 
 type GameStateWaiting = {
   tag: "waiting";
@@ -75,10 +74,10 @@ export function getGameState(gameId: string) {
       );
     },
     async startGame(playerIds: Record<string, boolean>) {
-      const cards = _(generate(4))
+      const cards = _(generate(8))
         .shuffle()
         .map((pics) => ({
-          id: sha256().update(pics.join()).digest("hex"),
+          id: sha256(pics.join("|")).toString(),
           pics,
         }))
         .value();

@@ -2,20 +2,24 @@
   import { createEventDispatcher } from "svelte";
   import Pic from "./Pic.svelte";
   import { templates } from "../shared/templates";
+  import { sha256 } from "../shared/utils";
   export let pics: number[];
   export let clickable = false;
   export let disabled = false;
 
-  $: template = templates[0];
+  $: template = templates[sha256(pics.join("|")) % templates.length]!;
+  function getTemplateItem(i: number) {
+    // `!` does not work in markup
+    return template[i]!;
+  }
+
   const dispatch = createEventDispatcher<{ move: number }>();
 </script>
 
 <div class="card" class:disabled>
   {#each pics as pic, i}
     <Pic
-      x={`${template[i].x}%`}
-      y={`${template[i].y}%`}
-      scale={template[i].scale}
+      {...getTemplateItem(i)}
       {pic}
       {clickable}
       {disabled}
@@ -28,9 +32,9 @@
   .card {
     width: 100%;
     height: 100%;
-    font-size: calc(var(--size) * 0.3);
-    border: 1px solid black;
-    border-radius: 5%;
+    font-size: calc(var(--size) * 0.2);
+    border: 3px solid black;
+    border-radius: 50%;
     position: relative;
     background: white;
     user-select: none;

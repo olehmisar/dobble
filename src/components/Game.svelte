@@ -106,7 +106,7 @@
       {/each}
     </div>
 
-    <div class="deck" style="--size: 120px;">
+    <div class="deck" style="--size: 240px;">
       {#each $gameState.remainingCards as card}
         <div
           class="card-wrapper"
@@ -167,7 +167,7 @@
   .deck {
     position: relative;
     width: var(--size);
-    height: calc(var(--size) * 1.5);
+    height: var(--size);
   }
 
   .card-wrapper {
