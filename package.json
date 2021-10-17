@@ -1,33 +1,27 @@
 {
   "name": "svelte-app",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "start": "sirv public --no-clear",
+    "build": "vite build",
+    "dev": "vite",
+    "serve": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
-    "@rollup/plugin-commonjs": "^17.0.0",
-    "@rollup/plugin-node-resolve": "^11.0.0",
-    "@rollup/plugin-typescript": "^8.0.0",
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.28",
     "@tsconfig/svelte": "^2.0.0",
     "@types/lodash": "^4.14.175",
     "firebase": "^8.10.0",
     "hash.js": "^1.1.7",
     "lodash": "^4.17.21",
-    "rollup": "^2.3.4",
-    "rollup-plugin-css-only": "^3.1.0",
-    "rollup-plugin-livereload": "^2.0.0",
-    "rollup-plugin-svelte": "^7.0.0",
-    "rollup-plugin-terser": "^7.0.0",
-    "sirv-cli": "^1.0.0",
     "svelte": "^3.0.0",
     "svelte-check": "^2.0.0",
     "svelte-preprocess": "^4.0.0",
     "tslib": "^2.0.0",
     "typesaurus": "^7.2.0",
-    "typescript": "^4.0.0"
+    "typescript": "^4.0.0",
+    "vite": "^2.6.7"
   }
 }
