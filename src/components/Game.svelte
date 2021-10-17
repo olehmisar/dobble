@@ -8,6 +8,7 @@
     playerId2Username,
   } from "../stores/user-store";
   import _ from "lodash";
+  import { onDestroy } from "svelte";
 
   export let gameId: string;
 
@@ -25,6 +26,15 @@
       $playerId &&
       $gameState.players[$playerId]?.cards) ||
     [];
+
+  function leaveGame() {
+    if (!$playerId) {
+      return;
+    }
+    gameState.removePlayer($playerId);
+  }
+  onDestroy(leaveGame);
+  window.addEventListener("beforeunload", leaveGame);
 </script>
 
 {#if $gameState.tag === "waiting"}
