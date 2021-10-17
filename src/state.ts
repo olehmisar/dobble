@@ -49,7 +49,7 @@ type Move = {
   selectedPic: Pic;
 };
 
-export function getGameState(gameId: string, playerId: string) {
+export function getGameState(gameId: string) {
   typesaurus.get(db.games, gameId).then((doc) => {
     if (doc) {
       return;

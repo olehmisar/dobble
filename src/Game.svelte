@@ -11,7 +11,7 @@
     moveAnimation.receive,
   ];
 
-  $: gameState = $playerId && getGameState(gameId, $playerId);
+  $: gameState = getGameState(gameId);
 
   let coords: Record<string, { x: number; y: number }> = {};
   $: {
@@ -30,9 +30,7 @@
   }
 </script>
 
-{#if !gameState}
-  Loading...
-{:else if $gameState.tag === "waiting"}
+{#if $gameState.tag === "waiting"}
   <p>Waiting...</p>
   {#each Object.entries($gameState.playerIds)
     .filter(([, joined]) => joined)
@@ -41,7 +39,7 @@
   {/each}
   <button
     on:click={() => {
-      if (!gameState || $gameState.tag !== "waiting" || !$playerId) {
+      if ($gameState.tag !== "waiting" || !$playerId) {
         return;
       }
       gameState.joinGame($playerId);
@@ -51,7 +49,7 @@
   </button>
   <button
     on:click={() => {
-      if (!gameState || $gameState.tag !== "waiting") {
+      if ($gameState.tag !== "waiting") {
         return;
       }
       gameState.startGame($gameState.playerIds);
@@ -75,7 +73,7 @@
             $playerId && $gameState.players[$playerId]?.lastMoveWasWrong
           )}
           on:move={(e) => {
-            if (!gameState || !$playerId) {
+            if (!$playerId) {
               return;
             }
             gameState.doMove({
