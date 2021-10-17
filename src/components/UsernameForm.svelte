@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { username } from "./user-store";
+  import { username } from "../stores/user-store";
   let usernameInput = "";
   function submit() {
     $username = usernameInput.trim();

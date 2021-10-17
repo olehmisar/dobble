@@ -1,9 +1,9 @@
 import firebase from "firebase";
 import _ from "lodash";
 import { derived, readable, writable } from "svelte/store";
-import { persistentWritable } from "./local-storage-store";
+import { persistentWritable } from "../shared/local-storage-store";
 import * as typesaurus from "typesaurus";
-import { db } from "./db";
+import { db } from "../db";
 
 export const username = persistentWritable<string | undefined>(
   "username",

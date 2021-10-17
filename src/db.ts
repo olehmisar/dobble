@@ -1,7 +1,7 @@
 import firebase from "firebase/app";
 import "firebase/firestore";
 import * as typesaurus from "typesaurus";
-import type { GameState } from "./state";
+import type { GameState } from "./stores/state";
 
 firebase.initializeApp({
   apiKey: "AIzaSyAEJv_M-8O3GK1dGFkxjHKm-NV2iDyaxfU",

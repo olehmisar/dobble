@@ -2,9 +2,9 @@ import { sha256 } from "hash.js";
 import _ from "lodash";
 import { get, readable } from "svelte/store";
 import * as typesaurus from "typesaurus";
-import { db } from "./db";
-import { generate } from "./dobble-algo";
-import { iife } from "./utils";
+import { db } from "../db";
+import { generate } from "../shared/dobble-algo";
+import { iife } from "../shared/utils";
 
 type GameStateWaiting = {
   tag: "waiting";

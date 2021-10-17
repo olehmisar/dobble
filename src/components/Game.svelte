@@ -1,8 +1,12 @@
 <script lang="ts">
-  import { moveAnimation } from "./animation";
+  import { moveAnimation } from "../shared/animation";
   import Card from "./Card.svelte";
-  import { getGameState } from "./state";
-  import { fetchUsernames, playerId, playerId2Username } from "./user-store";
+  import { getGameState } from "../stores/state";
+  import {
+    fetchUsernames,
+    playerId,
+    playerId2Username,
+  } from "../stores/user-store";
   import _ from "lodash";
 
   export let gameId: string;

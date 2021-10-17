@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Game from "./Game.svelte";
-  import { playerId, username } from "./user-store";
-  import UsernameForm from "./UsernameForm.svelte";
+  import Game from "./components/Game.svelte";
+  import { playerId, username } from "./stores/user-store";
+  import UsernameForm from "./components/UsernameForm.svelte";
   import { Router, Route, links, navigate } from "svelte-routing";
   import * as typesaurus from "typesaurus";
   import { db } from "./db";
