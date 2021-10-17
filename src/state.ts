@@ -103,6 +103,14 @@ export function getGameState(gameId: string) {
         typesaurus.field(["players", playerId], true),
       ]);
     },
+    async removePlayer(playerId: string) {
+      if (get(_s).tag !== "waiting") {
+        return;
+      }
+      await typesaurus.update<GameStateWaiting>(db.games, gameId, [
+        typesaurus.field(["players", playerId], false),
+      ]);
+    },
     async doMove(move: Move) {
       const s = get(_s);
       if (s.tag !== "inProgress") {
