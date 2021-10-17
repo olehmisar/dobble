@@ -50,6 +50,9 @@
     Join
   </button>
   <button
+    disabled={$gameState.tag === "waiting" &&
+      _($gameState.players).values().compact().size() < 2}
+    title="2 players minimum"
     on:click={() => {
       if ($gameState.tag !== "waiting") {
         return;

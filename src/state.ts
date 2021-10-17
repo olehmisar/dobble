@@ -89,6 +89,9 @@ export function getGameState(gameId: string) {
         }))
         .keyBy(({ playerId }) => playerId)
         .value();
+      if (_.size(players) < 2) {
+        return;
+      }
       await typesaurus.set(db.games, gameId, {
         tag: "inProgress",
         players,
