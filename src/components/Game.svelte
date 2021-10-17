@@ -26,6 +26,13 @@
       $playerId &&
       $gameState.players[$playerId]?.cards) ||
     [];
+  $: players =
+    $gameState.tag !== "waiting"
+      ? _($gameState.players)
+          .values()
+          .orderBy((p) => p.playerId)
+          .value()
+      : [];
 
   function leaveGame() {
     if (!$playerId) {
@@ -79,6 +86,14 @@
     <p>
       Winner: {$playerId2Username[$gameState.winnerId]}
     </p>
+    <p>Results:</p>
+    <ul>
+      {#each players as player (player.playerId)}
+        <li>
+          {$playerId2Username[player.playerId]} - {player.cards.length} cards
+        </li>
+      {/each}
+    </ul>
   {/if}
   <p>
     <button
@@ -94,11 +109,7 @@
   </p>
   <div class="game">
     <div style="display: flex; justify-content: space-around; gap: 1rem;">
-      {#each _($gameState.players)
-        .values()
-        .filter((p) => p.playerId !== $playerId)
-        .orderBy((p) => p.playerId)
-        .value() as player}
+      {#each players.filter((p) => p.playerId !== $playerId) as player (player.playerId)}
         <div class="center">
           {$playerId2Username[player.playerId]}
           <div class="deck" style="--size: 60px;">
@@ -116,31 +127,37 @@
       {/each}
     </div>
 
-    <div class="deck" style="--size: 240px;">
-      {#each $gameState.remainingCards as card}
-        <div
-          class="card-wrapper"
-          in:moveAnimationReceive={{ key: card.id }}
-          out:moveAnimationSend={{ key: card.id }}
-        >
-          <Card
-            pics={card.pics}
-            clickable
-            disabled={!!(
-              $playerId && $gameState.players[$playerId]?.lastMoveWasWrong
-            )}
-            on:move={(e) => {
-              if (!$playerId) {
-                return;
-              }
-              gameState.doMove({
-                playerId: $playerId,
-                selectedPic: e.detail,
-              });
-            }}
-          />
-        </div>
-      {/each}
+    <div class="center">
+      <div class="deck" style="--size: 240px;">
+        {#each $gameState.remainingCards as card (card.id)}
+          <div
+            class="card-wrapper"
+            in:moveAnimationReceive={{ key: card.id }}
+            out:moveAnimationSend={{ key: card.id }}
+          >
+            <Card
+              pics={card.pics}
+              clickable
+              disabled={!!(
+                $playerId && $gameState.players[$playerId]?.lastMoveWasWrong
+              )}
+              on:move={(e) => {
+                if (!$playerId) {
+                  return;
+                }
+                gameState.doMove({
+                  playerId: $playerId,
+                  selectedPic: e.detail,
+                });
+              }}
+            />
+          </div>
+        {/each}
+      </div>
+      {$gameState.remainingCards.length} card{$gameState.remainingCards
+        .length === 1
+        ? ""
+        : "s"}
     </div>
 
     <div class="center">
