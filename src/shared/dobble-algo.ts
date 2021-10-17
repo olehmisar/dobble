@@ -1,14 +1,13 @@
 export function generate(n: number) {
-  let inputs = [],
-    total = n * --n + 1;
-  for (let i = 0; i < total; i++) inputs[i] = i;
+  const total = n * --n + 1;
+  const inputs = emojis.slice(0, total);
   return createCards(inputs, n);
 }
 
 // `inputs` is an array of (prime * (prime + 1) + 1) values.
 // eg. a list of images (['file1.png', 'img2.png'...])
-function createCards(inputs: number[], prime: number) {
-  let cards: number[][] = [];
+function createCards(inputs: string[], prime: number) {
+  let cards: string[][] = [];
 
   // Split inputs into multi-dim array of length prime.
   while (inputs.length) cards.push(inputs.splice(0, prime));
@@ -24,7 +23,7 @@ function createCards(inputs: number[], prime: number) {
   // Cards with the same angle will not overlap, so they are given the corresponding card from the last row.
   for (let angle = 0; angle < prime; angle++) {
     for (let start = 0; start < prime; start++) {
-      let row: number[] = [];
+      let row: string[] = [];
       for (let col = 0; col < prime; col++) {
         let inc = (col * angle + start) % prime;
         row.push(cards[col]![inc]!);
@@ -35,3 +34,63 @@ function createCards(inputs: number[], prime: number) {
 
   return cards;
 }
+
+const emojis = [
+  "🦵",
+  "🦾",
+  "🍕",
+  "🚟",
+  "👑",
+  "🚧",
+  "🔐",
+  "🌗",
+  "🐒",
+  "📻",
+  "🔴",
+  "🌖",
+  "💖",
+  "🧝",
+  "⛺",
+  "📉",
+  "🧂",
+  "🦟",
+  "🎏",
+  "🗼",
+  "🕕",
+  "🙅",
+  "🤸",
+  "🚝",
+  "🧜",
+  "🍁",
+  "🚊",
+  "🔦",
+  "🐁",
+  "🧲",
+  "🧃",
+  "💕",
+  "👏",
+  "🌀",
+  "🎄",
+  "🔶",
+  "🧼",
+  "🦑",
+  "🍠",
+  "👎",
+  "🌁",
+  "🍀",
+  "🚬",
+  "👭",
+  "🍏",
+  "😾",
+  "👅",
+  "📯",
+  "👗",
+  "👰",
+  "🚥",
+  "🙆",
+  "🐅",
+  "🥚",
+  "💚",
+  "📮",
+  "🎦",
+];

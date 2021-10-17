@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { sha256 } from "./utils";
 
-const padding = 0.2;
+const padding = 0.25;
 export const templates = _.times(10, (i) => generateTemplate(i)).map(
   (template) =>
     template.map(([x, y, scale, rotation]) => ({

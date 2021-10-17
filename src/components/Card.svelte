@@ -3,7 +3,9 @@
   import Pic from "./Pic.svelte";
   import { templates } from "../shared/templates";
   import { sha256 } from "../shared/utils";
-  export let pics: number[];
+  import type { PicData } from "../stores/state";
+
+  export let pics: PicData[];
   export let clickable = false;
   export let disabled = false;
 
@@ -13,7 +15,7 @@
     return template[i]!;
   }
 
-  const dispatch = createEventDispatcher<{ move: number }>();
+  const dispatch = createEventDispatcher<{ move: PicData }>();
 </script>
 
 <div class="card" class:disabled>

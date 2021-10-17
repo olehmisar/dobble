@@ -35,11 +35,11 @@ function makeInitialState(playerIds: string[] = []): GameState {
   };
 }
 
-type Pic = number;
+export type PicData = string;
 
 export type Card = {
   id: string;
-  pics: Pic[];
+  pics: PicData[];
 };
 
 type PlayerData = {
@@ -50,7 +50,7 @@ type PlayerData = {
 
 type Move = {
   playerId: string;
-  selectedPic: Pic;
+  selectedPic: PicData;
 };
 
 export function getGameState(gameId: string) {
@@ -170,6 +170,6 @@ export function getGameState(gameId: string) {
   };
 }
 
-function cardContainsPic(card: Card, pic: Pic) {
+function cardContainsPic(card: Card, pic: PicData) {
   return card.pics.some((p) => p === pic);
 }

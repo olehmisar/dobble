@@ -1,9 +1,11 @@
 <script lang="ts">
+  import type { PicData } from "../stores/state";
+
   export let x: string;
   export let y: string;
   export let scale: string;
   export let rotation: string;
-  export let pic: number;
+  export let pic: PicData;
   export let disabled: boolean;
   export let clickable: boolean;
 </script>
