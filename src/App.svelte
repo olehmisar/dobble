@@ -1,20 +1,36 @@
 <script lang="ts">
   import Game from "./components/Game.svelte";
-  import { playerId, username } from "./stores/user-store";
+  import { username } from "./stores/user-store";
   import UsernameForm from "./components/UsernameForm.svelte";
   import { Router, Route, links, navigate } from "svelte-routing";
   import * as typesaurus from "typesaurus";
   import { db } from "./db";
 
   let newGameId = "";
+  let showUsernameForm = false;
 </script>
 
-{$playerId} - {$username}
+<div use:links>
+  <header style="display: flex; gap: 1rem">
+    <a href="/" style="font-size: 2rem;">Dobble</a>
+    <div style="flex-grow: 1" />
+    <div>
+      {$username}
+      <button
+        on:click={() => {
+          showUsernameForm = true;
+        }}>Change username</button
+      >
+    </div>
+  </header>
 
-{#if !$username}
-  <UsernameForm />
-{:else}
-  <div use:links>
+  {#if !$username || showUsernameForm}
+    <UsernameForm
+      on:change={() => {
+        showUsernameForm = false;
+      }}
+    />
+  {:else}
     <Router>
       <Route path="/play/:gameId" let:params>
         <Game gameId={params.gameId || ""} />
@@ -34,5 +50,5 @@
         </form>
       </Route>
     </Router>
-  </div>
-{/if}
+  {/if}
+</div>

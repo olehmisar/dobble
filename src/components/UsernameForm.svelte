@@ -1,8 +1,11 @@
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
   import { username } from "../stores/user-store";
-  let usernameInput = "";
+  let usernameInput = $username ?? "";
+  const dispatch = createEventDispatcher<{ change: string }>();
   function submit() {
     $username = usernameInput.trim();
+    dispatch("change", $username);
   }
 </script>
 
