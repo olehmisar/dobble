@@ -26,10 +26,15 @@ export type GameState =
   | GameStateInProgress
   | GameStateFinished;
 
-const INITIAL_STATE: GameState = {
-  tag: "waiting",
-  players: {},
-};
+function makeInitialState(playerIds: string[] = []): GameState {
+  return {
+    tag: "waiting",
+    players: _(playerIds)
+      .keyBy((id) => id)
+      .mapValues(_.stubTrue)
+      .value(),
+  };
+}
 
 type Pic = number;
 
@@ -54,14 +59,21 @@ export function getGameState(gameId: string) {
     if (doc) {
       return;
     }
-    typesaurus.set(db.games, gameId, INITIAL_STATE);
+    typesaurus.set(db.games, gameId, makeInitialState());
   });
 
-  const _s = readable(INITIAL_STATE, (set) => {
+  const _s = readable(makeInitialState(), (set) => {
     typesaurus.onGet(db.games, gameId, (doc) => doc && set(doc.data));
   });
   return {
     subscribe: _s.subscribe,
+    async waitForPlayers() {
+      typesaurus.set(
+        db.games,
+        gameId,
+        makeInitialState(Object.keys(get(_s).players))
+      );
+    },
     async startGame(playerIds: Record<string, boolean>) {
       const cards = generate(4).map((pics) => ({
         id: sha256().update(pics.join()).digest("hex"),

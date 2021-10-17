@@ -57,7 +57,7 @@
           if ($gameState.tag !== "finished") {
             return;
           }
-          gameState.startGame(_.mapValues($gameState.players, _.stubTrue));
+          gameState.waitForPlayers();
         }}>Again</button
       >
     </p>
