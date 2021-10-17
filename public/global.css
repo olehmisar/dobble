@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 html,
 body {
   position: relative;
@@ -65,4 +69,12 @@ button:not(:disabled):active {
 
 button:focus {
   border-color: #666;
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
 }

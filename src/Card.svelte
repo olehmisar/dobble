@@ -25,10 +25,11 @@
 
 <style>
   .card {
-    width: 160px;
-    height: 240px;
-    font-size: 3rem;
+    width: 100%;
+    height: 100%;
+    font-size: calc(var(--size) * 0.3);
     border: 1px solid black;
+    border-radius: 5%;
     position: relative;
     background: white;
     user-select: none;

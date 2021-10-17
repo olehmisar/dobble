@@ -3,6 +3,7 @@
   import Card from "./Card.svelte";
   import { getGameState } from "./state";
   import { playerId } from "./user-store";
+  import _ from "lodash";
 
   export let gameId: string;
 
@@ -12,22 +13,11 @@
   ];
 
   $: gameState = getGameState(gameId);
-
-  let coords: Record<string, { x: number; y: number }> = {};
-  $: {
-    if (gameState && $gameState.tag === "inProgress") {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const r = Math.min(w, h);
-      const players = Object.values($gameState.players);
-      players.forEach((player, i) => {
-        const angle = (i * Math.PI * 2) / players.length;
-        const x = (w + Math.cos(angle) * r) / 2;
-        const y = (h + Math.sin(angle) * r) / 2;
-        coords[player.playerId] = { x, y };
-      });
-    }
-  }
+  $: myCards =
+    ($gameState.tag !== "waiting" &&
+      $playerId &&
+      $gameState.players[$playerId]?.cards) ||
+    [];
 </script>
 
 {#if $gameState.tag === "waiting"}
@@ -56,47 +46,73 @@
     }}>Start game</button
   >
 {:else}
-  <div class="relative">
-    {#if $gameState.tag === "finished"}
-      <p>Winner: {$gameState.winnerId}</p>
-    {/if}
-    {#each $gameState.remainingCards as card}
-      <div
-        class="card-wrapper"
-        in:moveAnimationReceive={{ key: card.id }}
-        out:moveAnimationSend={{ key: card.id }}
+  {#if $gameState.tag === "finished"}
+    <p>
+      Winner: {$gameState.winnerId}
+      <button
+        on:click={() => {
+          if ($gameState.tag !== "finished") {
+            return;
+          }
+          gameState.startGame(_.mapValues($gameState.players, _.stubTrue));
+        }}>Again</button
       >
-        <Card
-          pics={card.pics}
-          clickable
-          disabled={!!(
-            $playerId && $gameState.players[$playerId]?.lastMoveWasWrong
-          )}
-          on:move={(e) => {
-            if (!$playerId) {
-              return;
-            }
-            gameState.doMove({
-              playerId: $playerId,
-              selectedPic: e.detail,
-            });
-          }}
-        />
-      </div>
-    {/each}
-  </div>
+    </p>
+  {/if}
+  <div class="game">
+    <div style="display: flex; justify-content: space-around">
+      {#each _($gameState.players)
+        .values()
+        .filter((p) => p.playerId !== $playerId)
+        .orderBy((p) => p.playerId)
+        .value() as player}
+        <div class="center">
+          {player.playerId}
+          <div class="deck" style="--size: 60px;">
+            {#each player.cards as card}
+              <div
+                class="card-wrapper"
+                in:moveAnimationReceive={{ key: card.id }}
+                out:moveAnimationSend={{ key: card.id }}
+              >
+                <Card pics={card.pics} />
+              </div>
+            {/each}
+          </div>
+        </div>
+      {/each}
+    </div>
 
-  <div class="relative">
-    {#each Object.values($gameState.players) as player}
-      <div
-        style={`
-        position: absolute;
-        left: ${coords[player.playerId]?.x}px;
-        top: ${coords[player.playerId]?.y}px}
-      `}
-      >
-        {player.playerId}
-        {#each player.cards as card}
+    <div class="deck" style="--size: 120px;">
+      {#each $gameState.remainingCards as card}
+        <div
+          class="card-wrapper"
+          in:moveAnimationReceive={{ key: card.id }}
+          out:moveAnimationSend={{ key: card.id }}
+        >
+          <Card
+            pics={card.pics}
+            clickable
+            disabled={!!(
+              $playerId && $gameState.players[$playerId]?.lastMoveWasWrong
+            )}
+            on:move={(e) => {
+              if (!$playerId) {
+                return;
+              }
+              gameState.doMove({
+                playerId: $playerId,
+                selectedPic: e.detail,
+              });
+            }}
+          />
+        </div>
+      {/each}
+    </div>
+
+    <div class="center">
+      <div class="deck" style="--size: 120px">
+        {#each myCards as card}
           <div
             class="card-wrapper"
             in:moveAnimationReceive={{ key: card.id }}
@@ -106,16 +122,39 @@
           </div>
         {/each}
       </div>
-    {/each}
+      My cards
+    </div>
   </div>
 {/if}
 
 <style>
-  .card-wrapper {
-    position: absolute;
+  .game {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 30px;
+    align-items: center;
+    background: #387d44;
+    border: 20px solid #6f4f38;
+    border-radius: 100px;
   }
 
-  .relative {
+  .deck {
     position: relative;
+    width: var(--size);
+    height: calc(var(--size) * 1.5);
+  }
+
+  .card-wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+
+  .center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 </style>
