@@ -61,16 +61,20 @@
   {#if $gameState.tag === "finished"}
     <p>
       Winner: {$playerId2Username[$gameState.winnerId]}
-      <button
-        on:click={() => {
-          if ($gameState.tag !== "finished") {
-            return;
-          }
-          gameState.waitForPlayers();
-        }}>Again</button
-      >
     </p>
   {/if}
+  <p>
+    <button
+      on:click={() => {
+        const confirmed =
+          $gameState.tag === "finished" || confirm("Restart the game?");
+        if (!confirmed) {
+          return;
+        }
+        gameState.waitForPlayers();
+      }}>Restart</button
+    >
+  </p>
   <div class="game">
     <div style="display: flex; justify-content: space-around; gap: 1rem;">
       {#each _($gameState.players)
