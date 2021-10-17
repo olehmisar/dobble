@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "vite build",
+    "build": "yarn run check && vite build",
+    "deploy": "surge ./dist dobble-spotit.surge.sh",
     "dev": "vite",
     "serve": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"
@@ -16,6 +17,7 @@
     "firebase": "^8.10.0",
     "hash.js": "^1.1.7",
     "lodash": "^4.17.21",
+    "surge": "^0.23.0",
     "svelte": "^3.0.0",
     "svelte-check": "^2.0.0",
     "svelte-preprocess": "^4.0.0",
