@@ -3,10 +3,9 @@
   import { username } from "./stores/user-store";
   import UsernameForm from "./components/UsernameForm.svelte";
   import { Router, Route, links, navigate } from "svelte-routing";
-  import * as typesaurus from "typesaurus";
-  import { db } from "./db";
+  import { sha256 } from "./shared/utils";
 
-  let newGameId = "";
+  let newGameId = sha256(Math.random()).toString(16).slice(0, 8);
   let showUsernameForm = false;
 </script>
 
@@ -41,14 +40,12 @@
         <form
           on:submit|preventDefault={async () => {
             newGameId = newGameId.trim();
-            if ((await typesaurus.get(db.games, newGameId))?.data) {
-              alert("Room exists");
-            }
             navigate(`/play/${newGameId}`);
           }}
         >
-          <input bind:value={newGameId} placeholder="Room Name" />
-          <button>New game</button>
+          Room name:
+          <input bind:value={newGameId} />
+          <button>Create/Join Room</button>
         </form>
       </Route>
     </Router>
