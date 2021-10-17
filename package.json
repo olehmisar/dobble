@@ -19,6 +19,7 @@
     "svelte": "^3.0.0",
     "svelte-check": "^2.0.0",
     "svelte-preprocess": "^4.0.0",
+    "svelte-routing": "^1.6.0",
     "tslib": "^2.0.0",
     "typesaurus": "^7.2.0",
     "typescript": "^4.0.0",
