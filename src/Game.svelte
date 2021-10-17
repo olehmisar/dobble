@@ -59,6 +59,9 @@
   >
 {:else}
   <div class="relative">
+    {#if $gameState.tag === "finished"}
+      <p>Winner: {$gameState.winnerId}</p>
+    {/if}
     {#each $gameState.remainingCards as card}
       <div
         class="card-wrapper"

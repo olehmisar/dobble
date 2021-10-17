@@ -15,7 +15,16 @@ type GameStateInProgress = {
   players: Record<string, PlayerData>;
   remainingCards: Card[];
 };
-export type GameState = GameStateWaiting | GameStateInProgress;
+type GameStateFinished = {
+  tag: "finished";
+  winnerId: string;
+  players: Record<string, PlayerData>;
+  remainingCards: Card[];
+};
+export type GameState =
+  | GameStateWaiting
+  | GameStateInProgress
+  | GameStateFinished;
 
 const INITIAL_STATE: GameState = {
   tag: "waiting",
@@ -98,7 +107,7 @@ export function getGameState(gameId: string, playerId: string) {
       await typesaurus.update(
         db.games,
         gameId,
-        iife(() => {
+        iife<GameState>(() => {
           const topPlayerCard = _.last(player.cards)!;
           if (!cardContainsPic(topPlayerCard, move.selectedPic)) {
             s.players[move.playerId]!.lastMoveWasWrong = true;
@@ -117,6 +126,18 @@ export function getGameState(gameId: string, playerId: string) {
           Object.values(s.players).forEach((player) => {
             player.lastMoveWasWrong = false;
           });
+          if (s.remainingCards.length === 0) {
+            const winnerId = _(s.players)
+              .values()
+              .orderBy((player) => player.cards.length, "desc")
+              .first()!.playerId;
+            return {
+              tag: "finished",
+              winnerId,
+              players: s.players,
+              remainingCards: s.remainingCards,
+            };
+          }
           return s;
         })
       );
