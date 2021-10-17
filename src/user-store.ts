@@ -1,7 +1,11 @@
 import firebase from "firebase";
-import { readable, writable } from "svelte/store";
+import { readable } from "svelte/store";
+import { persistentWritable } from "./local-storage-store";
 
-export const username = writable<string | undefined>(undefined);
+export const username = persistentWritable<string | undefined>(
+  "username",
+  undefined
+);
 
 firebase
   .auth()
