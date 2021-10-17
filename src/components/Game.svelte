@@ -2,11 +2,7 @@
   import { moveAnimation } from "../shared/animation";
   import Card from "./Card.svelte";
   import { getGameState } from "../stores/state";
-  import {
-    fetchUsernames,
-    playerId,
-    playerId2Username,
-  } from "../stores/user-store";
+  import { fetchUsernames, playerId } from "../stores/user-store";
   import _ from "lodash";
   import { onDestroy } from "svelte";
 
@@ -18,9 +14,7 @@
   ];
 
   $: gameState = getGameState(gameId);
-  $: {
-    fetchUsernames(Object.keys($gameState.players));
-  }
+  $: playerId2Username = fetchUsernames(Object.keys($gameState.players));
   $: myCards =
     ($gameState.tag !== "waiting" &&
       $playerId &&
