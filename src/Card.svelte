@@ -15,6 +15,7 @@
     <Pic
       x={`${template[i].x}%`}
       y={`${template[i].y}%`}
+      scale={template[i].scale}
       {pic}
       {clickable}
       {disabled}
