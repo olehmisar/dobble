@@ -75,10 +75,13 @@ export function getGameState(gameId: string) {
       );
     },
     async startGame(playerIds: Record<string, boolean>) {
-      const cards = generate(4).map((pics) => ({
-        id: sha256().update(pics.join()).digest("hex"),
-        pics,
-      }));
+      const cards = _(generate(4))
+        .shuffle()
+        .map((pics) => ({
+          id: sha256().update(pics.join()).digest("hex"),
+          pics,
+        }))
+        .value();
       const players = _(playerIds)
         .toPairs()
         .filter(([, joined]) => joined)
