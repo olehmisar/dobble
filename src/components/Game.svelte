@@ -14,7 +14,14 @@
   ];
 
   $: gameState = getGameState(gameId);
-  $: playerId2Username = fetchUsernames(Object.keys($gameState.players));
+  let playerIds: string[] = [];
+  $: {
+    const ids = Object.keys($gameState.players).sort();
+    if (!_.isEqual(ids, playerIds)) {
+      playerIds = ids;
+    }
+  }
+  $: playerId2Username = fetchUsernames(playerIds);
   $: myCards =
     ($gameState.tag !== "waiting" &&
       $playerId &&
