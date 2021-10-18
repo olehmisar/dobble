@@ -15,7 +15,7 @@
   class:clickable
   class:disabled
   style={`--x: ${x}; --y: ${y}; --scale: ${scale}; --rotation: ${rotation}`}
-  on:click
+  on:mousedown
 >
   <div class="pic-inner">
     {pic}

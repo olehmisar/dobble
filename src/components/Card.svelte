@@ -25,7 +25,7 @@
       {pic}
       {clickable}
       {disabled}
-      on:click={() => dispatch("move", pic)}
+      on:mousedown={() => dispatch("move", pic)}
     />
   {/each}
 </div>
