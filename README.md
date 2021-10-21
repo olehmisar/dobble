@@ -1,6 +1,6 @@
 # Dobble
 
-A simple dobble game to play with friends. <https://dobble-spotit.surge.sh>
+A simple dobble game to play with friends. <https://dobble-game.surge.sh>
 
 Code is a mess but it is good enough. Stack: firebase + svelte.
 
