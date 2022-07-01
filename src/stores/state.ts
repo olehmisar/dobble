@@ -13,6 +13,7 @@ type GameStateInProgress = {
   tag: "inProgress";
   players: Record<string, PlayerData>;
   remainingCards: Card[];
+  lastMoveTimestamp: number;
 };
 type GameStateFinished = {
   tag: "finished";
@@ -98,6 +99,7 @@ export function getGameState(gameId: string) {
         tag: "inProgress",
         players,
         remainingCards: cards,
+        lastMoveTimestamp: Date.now(),
       });
     },
     async joinGame(playerId: string) {
@@ -116,7 +118,7 @@ export function getGameState(gameId: string) {
         typesaurus.field(["players", playerId], false),
       ]);
     },
-    async doMove(move: Move) {
+    async doMove(move: Move): Promise<void> {
       const s = get(_s);
       if (s.tag !== "inProgress") {
         return;
@@ -125,9 +127,13 @@ export function getGameState(gameId: string) {
       if (!player || player.lastMoveWasWrong) {
         return;
       }
+      const currentTimestamp = Date.now();
+      if (s.lastMoveTimestamp >= currentTimestamp) {
+        return;
+      }
       const topDeckCard = _.last(s.remainingCards);
       if (!topDeckCard || !cardContainsPic(topDeckCard, move.selectedPic)) {
-        return s;
+        return;
       }
       await typesaurus.update(
         db.games,
@@ -148,6 +154,7 @@ export function getGameState(gameId: string) {
             return s;
           }
           s.players[move.playerId]!.cards.push(s.remainingCards.pop()!);
+          s.lastMoveTimestamp = currentTimestamp;
           Object.values(s.players).forEach((player) => {
             player.lastMoveWasWrong = false;
           });
