@@ -48,6 +48,11 @@
 
 {#if $gameState.tag === "waiting"}
   <p>Waiting for more players...</p>
+  <p>
+    Send this link to your friends so they can join the game: <a
+      href={window.location.href}>{window.location.href}</a
+    >
+  </p>
   <h4>Players joined:</h4>
   {#each Object.entries($gameState.players)
     .filter(([, joined]) => joined)
