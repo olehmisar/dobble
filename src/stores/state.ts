@@ -5,9 +5,6 @@ import { db } from "../db";
 import { generate } from "../shared/dobble-algo";
 import { iife, sha256 } from "../shared/utils";
 
-type GameStateLoading = {
-  tag: "loading";
-};
 type GameStateWaiting = {
   tag: "waiting";
   players: Record<string, boolean>;
@@ -24,7 +21,6 @@ type GameStateFinished = {
   remainingCards: Card[];
 };
 export type GameState =
-  | GameStateLoading
   | GameStateWaiting
   | GameStateInProgress
   | GameStateFinished;
@@ -65,14 +61,14 @@ export function getGameState(gameId: string) {
     typesaurus.set(db.games, gameId, makeInitialState());
   });
 
-  const _s = readable<GameState>({ tag: "loading" }, (set) => {
+  const _s = readable<GameState | undefined>(undefined, (set) => {
     typesaurus.onGet(db.games, gameId, (doc) => doc && set(doc.data));
   });
   return {
     subscribe: _s.subscribe,
     async restartGame() {
       const s = get(_s);
-      if (s.tag === "loading" || s.tag === "waiting") {
+      if (!s || s.tag === "waiting") {
         return;
       }
       typesaurus.set(
@@ -109,7 +105,7 @@ export function getGameState(gameId: string) {
       });
     },
     async joinGame(playerId: string) {
-      if (get(_s).tag !== "waiting") {
+      if (get(_s)?.tag !== "waiting") {
         return;
       }
       await typesaurus.update<GameStateWaiting>(db.games, gameId, [
@@ -117,7 +113,7 @@ export function getGameState(gameId: string) {
       ]);
     },
     async removePlayer(playerId: string) {
-      if (get(_s).tag !== "waiting") {
+      if (get(_s)?.tag !== "waiting") {
         return;
       }
       await typesaurus.update<GameStateWaiting>(db.games, gameId, [
@@ -126,7 +122,7 @@ export function getGameState(gameId: string) {
     },
     async doMove(move: Move) {
       const s = get(_s);
-      if (s.tag !== "inProgress") {
+      if (s?.tag !== "inProgress") {
         return;
       }
       const player = s.players[move.playerId];
