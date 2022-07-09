@@ -17,17 +17,21 @@
   $: gameState = getGameState(gameId);
   let playerIds: string[] = [];
   $: {
-    const ids = Object.keys($gameState.players).sort();
-    if (!_.isEqual(ids, playerIds)) {
-      playerIds = ids;
+    if ($gameState.tag !== "loading") {
+      const ids = Object.keys($gameState.players).sort();
+      if (!_.isEqual(ids, playerIds)) {
+        playerIds = ids;
+      }
     }
   }
   $: playerId2Username = fetchUsernames(playerIds);
   $: myCards =
-    ($gameState.tag !== "waiting" && $gameState.players[myPlayerId]?.cards) ||
+    ($gameState.tag !== "loading" &&
+      $gameState.tag !== "waiting" &&
+      $gameState.players[myPlayerId]?.cards) ||
     [];
   $: players =
-    $gameState.tag !== "waiting"
+    $gameState.tag !== "loading" && $gameState.tag !== "waiting"
       ? _($gameState.players)
           .values()
           .orderBy((p) => p.playerId)
@@ -46,7 +50,9 @@
   window.addEventListener("beforeunload", leaveGame);
 </script>
 
-{#if $gameState.tag === "waiting"}
+{#if $gameState.tag === "loading"}
+  Loading game...
+{:else if $gameState.tag === "waiting"}
   <p>Waiting for more players...</p>
   <p>
     Send this link to your friends so they can join the game: <a
@@ -100,7 +106,7 @@
         if (!confirmed) {
           return;
         }
-        gameState.waitForPlayers();
+        gameState.restartGame();
       }}>Restart</button
     >
   </p>
