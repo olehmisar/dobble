@@ -17,7 +17,7 @@
   $: gameState = getGameState(gameId);
   let playerIds: string[] = [];
   $: {
-    if ($gameState.tag !== "loading") {
+    if ($gameState) {
       const ids = Object.keys($gameState.players).sort();
       if (!_.isEqual(ids, playerIds)) {
         playerIds = ids;
@@ -26,12 +26,11 @@
   }
   $: playerId2Username = fetchUsernames(playerIds);
   $: myCards =
-    ($gameState.tag !== "loading" &&
-      $gameState.tag !== "waiting" &&
-      $gameState.players[myPlayerId]?.cards) ||
-    [];
+    $gameState && $gameState.tag !== "waiting"
+      ? $gameState.players[myPlayerId]?.cards ?? []
+      : [];
   $: players =
-    $gameState.tag !== "loading" && $gameState.tag !== "waiting"
+    $gameState && $gameState.tag !== "waiting"
       ? _($gameState.players)
           .values()
           .orderBy((p) => p.playerId)
@@ -44,7 +43,7 @@
 
   let initiallyJoined = false;
   $: {
-    if (!initiallyJoined && $gameState.tag === "waiting") {
+    if (!initiallyJoined && $gameState?.tag === "waiting") {
       initiallyJoined = true;
       joinGame();
     }
@@ -57,7 +56,7 @@
   window.addEventListener("beforeunload", leaveGame);
 </script>
 
-{#if $gameState.tag === "loading"}
+{#if !$gameState}
   Loading game...
 {:else if $gameState.tag === "waiting"}
   <p>Waiting for more players...</p>
@@ -85,7 +84,7 @@
       _($gameState.players).values().compact().size() < 2}
     title="2 players minimum"
     on:click={() => {
-      if ($gameState.tag !== "waiting") {
+      if ($gameState?.tag !== "waiting") {
         return;
       }
       gameState.startGame($gameState.players);
@@ -109,7 +108,7 @@
     <button
       on:click={() => {
         const confirmed =
-          $gameState.tag === "finished" || confirm("Restart the game?");
+          $gameState?.tag === "finished" || confirm("Restart the game?");
         if (!confirmed) {
           return;
         }
