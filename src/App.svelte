@@ -17,7 +17,7 @@
       {$username}
       <button
         on:click={() => {
-          showUsernameForm = true;
+          showUsernameForm = !showUsernameForm;
         }}>Change username</button
       >
     </div>
