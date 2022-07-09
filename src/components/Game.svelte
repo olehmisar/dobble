@@ -41,7 +41,14 @@
   function joinGame() {
     gameState.joinGame(myPlayerId);
   }
-  onMount(joinGame);
+
+  let initiallyJoined = false;
+  $: {
+    if (!initiallyJoined && $gameState.tag === "waiting") {
+      initiallyJoined = true;
+      joinGame();
+    }
+  }
 
   function leaveGame() {
     gameState.removePlayer(myPlayerId);
