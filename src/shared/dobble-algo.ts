@@ -1,6 +1,8 @@
+import _ from "lodash";
+
 export function generate(n: number) {
   const total = n * --n + 1;
-  const inputs = emojis.slice(0, total);
+  const inputs = _(emojis).shuffle().slice(0, total).value();
   return createCards(inputs, n);
 }
 
@@ -31,6 +33,8 @@ function createCards(inputs: string[], prime: number) {
       cards.push([...row, angles![angle]!]);
     }
   }
+
+  cards = cards.map((x) => _.shuffle(x));
 
   return cards;
 }
