@@ -2,11 +2,12 @@
   import { moveAnimation } from "../shared/animation";
   import Card from "./Card.svelte";
   import { getGameState } from "../stores/state";
-  import { fetchUsernames, playerId } from "../stores/user-store";
+  import { fetchUsernames } from "../stores/user-store";
   import _ from "lodash";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   export let gameId: string;
+  export let myPlayerId: string;
 
   const [moveAnimationSend, moveAnimationReceive] = [
     moveAnimation.send,
@@ -23,9 +24,7 @@
   }
   $: playerId2Username = fetchUsernames(playerIds);
   $: myCards =
-    ($gameState.tag !== "waiting" &&
-      $playerId &&
-      $gameState.players[$playerId]?.cards) ||
+    ($gameState.tag !== "waiting" && $gameState.players[myPlayerId]?.cards) ||
     [];
   $: players =
     $gameState.tag !== "waiting"
@@ -35,18 +34,21 @@
           .value()
       : [];
 
+  function joinGame() {
+    gameState.joinGame(myPlayerId);
+  }
+  onMount(joinGame);
+
   function leaveGame() {
-    if (!$playerId) {
-      return;
-    }
-    gameState.removePlayer($playerId);
+    gameState.removePlayer(myPlayerId);
   }
   onDestroy(leaveGame);
   window.addEventListener("beforeunload", leaveGame);
 </script>
 
 {#if $gameState.tag === "waiting"}
-  <p>Waiting...</p>
+  <p>Waiting for more players...</p>
+  <h4>Players joined:</h4>
   {#each Object.entries($gameState.players)
     .filter(([, joined]) => joined)
     .map(([playerId]) => playerId) as playerId}
@@ -61,16 +63,12 @@
       >
     </p>
   {/each}
-  <button
-    on:click={() => {
-      if ($gameState.tag !== "waiting" || !$playerId) {
-        return;
-      }
-      gameState.joinGame($playerId);
-    }}
-  >
-    Join
-  </button>
+
+  {#if !$gameState.players[myPlayerId]}
+    <button on:click={joinGame}>Join game</button>
+  {:else}
+    <button on:click={leaveGame}>Leave game</button>
+  {/if}
   <button
     disabled={$gameState.tag === "waiting" &&
       _($gameState.players).values().compact().size() < 2}
@@ -110,7 +108,7 @@
   </p>
   <div class="game">
     <div style="display: flex; justify-content: space-around; gap: 1rem;">
-      {#each players.filter((p) => p.playerId !== $playerId) as player (player.playerId)}
+      {#each players.filter((p) => p.playerId !== myPlayerId) as player (player.playerId)}
         <div class="center">
           {$playerId2Username[player.playerId]}
           <div class="deck" style="--size: 60px;">
@@ -139,15 +137,10 @@
             <Card
               pics={card.pics}
               clickable
-              disabled={!!(
-                $playerId && $gameState.players[$playerId]?.lastMoveWasWrong
-              )}
+              disabled={!!$gameState.players[myPlayerId]?.lastMoveWasWrong}
               on:move={(e) => {
-                if (!$playerId) {
-                  return;
-                }
                 gameState.doMove({
-                  playerId: $playerId,
+                  playerId: myPlayerId,
                   selectedPic: e.detail,
                 });
               }}

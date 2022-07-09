@@ -1,6 +1,6 @@
 <script lang="ts">
   import Game from "./components/Game.svelte";
-  import { username } from "./stores/user-store";
+  import { myPlayerId, username } from "./stores/user-store";
   import UsernameForm from "./components/UsernameForm.svelte";
   import { Router, Route, links, navigate } from "svelte-routing";
   import { sha256 } from "./shared/utils";
@@ -32,22 +32,26 @@
   {/if}
 
   {#if $username}
-    <Router>
-      <Route path="/play/:gameId" let:params>
-        <Game gameId={params.gameId || ""} />
-      </Route>
-      <Route>
-        <form
-          on:submit|preventDefault={async () => {
-            newGameId = newGameId.trim();
-            navigate(`/play/${newGameId}`);
-          }}
-        >
-          Room name:
-          <input bind:value={newGameId} />
-          <button>Create/Join Room</button>
-        </form>
-      </Route>
-    </Router>
+    {#if !$myPlayerId}
+      Logging in...
+    {:else}
+      <Router>
+        <Route path="/play/:gameId" let:params>
+          <Game myPlayerId={$myPlayerId} gameId={params.gameId || ""} />
+        </Route>
+        <Route>
+          <form
+            on:submit|preventDefault={async () => {
+              newGameId = newGameId.trim();
+              navigate(`/play/${newGameId}`);
+            }}
+          >
+            Room name:
+            <input bind:value={newGameId} />
+            <button>Create/Join Room</button>
+          </form>
+        </Route>
+      </Router>
+    {/if}
   {/if}
 </div>
