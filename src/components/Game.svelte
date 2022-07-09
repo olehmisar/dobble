@@ -54,13 +54,6 @@
     .map(([playerId]) => playerId) as playerId}
     <p>
       {$playerId2Username[playerId]}
-      <button
-        title="Remove player"
-        style="color: red"
-        on:click={() => {
-          gameState.removePlayer(playerId);
-        }}>X</button
-      >
     </p>
   {/each}
 
