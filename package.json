@@ -4,8 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "yarn run check && vite build",
-    "deploy": "yarn build && cp ./dist/index.html ./dist/200.html && surge ./dist dobble-game.surge.sh",
+    "build": "yarn run check && vite build && cp ./dist/index.html ./dist/200.html",
+    "deploy": "yarn build && surge ./dist dobble-game.surge.sh",
     "dev": "vite",
     "serve": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"
