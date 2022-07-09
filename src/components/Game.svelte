@@ -4,7 +4,7 @@
   import { getGameState } from "../stores/state";
   import { fetchUsernames } from "../stores/user-store";
   import _ from "lodash";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
 
   export let gameId: string;
   export let myPlayerId: string;
