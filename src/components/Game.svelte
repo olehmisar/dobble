@@ -2,11 +2,12 @@
   import { moveAnimation } from "../shared/animation";
   import Card from "./Card.svelte";
   import { getGameState } from "../stores/state";
-  import { fetchUsernames, playerId } from "../stores/user-store";
+  import { fetchUsernames } from "../stores/user-store";
   import _ from "lodash";
   import { onDestroy } from "svelte";
 
   export let gameId: string;
+  export let myPlayerId: string;
 
   const [moveAnimationSend, moveAnimationReceive] = [
     moveAnimation.send,
@@ -16,61 +17,69 @@
   $: gameState = getGameState(gameId);
   let playerIds: string[] = [];
   $: {
-    const ids = Object.keys($gameState.players).sort();
-    if (!_.isEqual(ids, playerIds)) {
-      playerIds = ids;
+    if ($gameState.tag !== "loading") {
+      const ids = Object.keys($gameState.players).sort();
+      if (!_.isEqual(ids, playerIds)) {
+        playerIds = ids;
+      }
     }
   }
   $: playerId2Username = fetchUsernames(playerIds);
   $: myCards =
-    ($gameState.tag !== "waiting" &&
-      $playerId &&
-      $gameState.players[$playerId]?.cards) ||
+    ($gameState.tag !== "loading" &&
+      $gameState.tag !== "waiting" &&
+      $gameState.players[myPlayerId]?.cards) ||
     [];
   $: players =
-    $gameState.tag !== "waiting"
+    $gameState.tag !== "loading" && $gameState.tag !== "waiting"
       ? _($gameState.players)
           .values()
           .orderBy((p) => p.playerId)
           .value()
       : [];
 
-  function leaveGame() {
-    if (!$playerId) {
-      return;
+  function joinGame() {
+    gameState.joinGame(myPlayerId);
+  }
+
+  let initiallyJoined = false;
+  $: {
+    if (!initiallyJoined && $gameState.tag === "waiting") {
+      initiallyJoined = true;
+      joinGame();
     }
-    gameState.removePlayer($playerId);
+  }
+
+  function leaveGame() {
+    gameState.removePlayer(myPlayerId);
   }
   onDestroy(leaveGame);
   window.addEventListener("beforeunload", leaveGame);
 </script>
 
-{#if $gameState.tag === "waiting"}
-  <p>Waiting...</p>
+{#if $gameState.tag === "loading"}
+  Loading game...
+{:else if $gameState.tag === "waiting"}
+  <p>Waiting for more players...</p>
+  <p>
+    Send this link to your friends so they can join the game: <a
+      href={window.location.href}>{window.location.href}</a
+    >
+  </p>
+  <h4>Players joined:</h4>
   {#each Object.entries($gameState.players)
     .filter(([, joined]) => joined)
     .map(([playerId]) => playerId) as playerId}
     <p>
       {$playerId2Username[playerId]}
-      <button
-        title="Remove player"
-        style="color: red"
-        on:click={() => {
-          gameState.removePlayer(playerId);
-        }}>X</button
-      >
     </p>
   {/each}
-  <button
-    on:click={() => {
-      if ($gameState.tag !== "waiting" || !$playerId) {
-        return;
-      }
-      gameState.joinGame($playerId);
-    }}
-  >
-    Join
-  </button>
+
+  {#if !$gameState.players[myPlayerId]}
+    <button on:click={joinGame}>Join game</button>
+  {:else}
+    <button on:click={leaveGame}>Leave game</button>
+  {/if}
   <button
     disabled={$gameState.tag === "waiting" &&
       _($gameState.players).values().compact().size() < 2}
@@ -104,13 +113,13 @@
         if (!confirmed) {
           return;
         }
-        gameState.waitForPlayers();
+        gameState.restartGame();
       }}>Restart</button
     >
   </p>
   <div class="game">
     <div style="display: flex; justify-content: space-around; gap: 1rem;">
-      {#each players.filter((p) => p.playerId !== $playerId) as player (player.playerId)}
+      {#each players.filter((p) => p.playerId !== myPlayerId) as player (player.playerId)}
         <div class="center">
           {$playerId2Username[player.playerId]}
           <div class="deck" style="--size: 60px;">
@@ -139,15 +148,10 @@
             <Card
               pics={card.pics}
               clickable
-              disabled={!!(
-                $playerId && $gameState.players[$playerId]?.lastMoveWasWrong
-              )}
+              disabled={!!$gameState.players[myPlayerId]?.lastMoveWasWrong}
               on:move={(e) => {
-                if (!$playerId) {
-                  return;
-                }
                 gameState.doMove({
-                  playerId: $playerId,
+                  playerId: myPlayerId,
                   selectedPic: e.detail,
                 });
               }}

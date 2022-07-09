@@ -17,7 +17,7 @@ firebase
     console.error(error);
   });
 
-export const playerId = readable<string | undefined>(undefined, (set) => {
+export const myPlayerId = readable<string | undefined>(undefined, (set) => {
   firebase
     .auth()
     .onAuthStateChanged((user) => set(user ? user.uid : undefined));
@@ -41,9 +41,11 @@ export function fetchUsernames(playerIds: string[]) {
   );
 }
 
-derived([username, playerId], (x) => x).subscribe(([username, playerId]) => {
-  if (!username || !playerId) {
-    return;
+derived([username, myPlayerId], (x) => x).subscribe(
+  ([username, myPlayerId]) => {
+    if (!username || !myPlayerId) {
+      return;
+    }
+    typesaurus.upset(db.players, myPlayerId, { username });
   }
-  typesaurus.upset(db.players, playerId, { username });
-});
+);
