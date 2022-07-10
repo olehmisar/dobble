@@ -57,7 +57,7 @@
               <button>Create</button>
             </form>
             <form
-              on:submit|preventDefault={async (e) => {
+              on:submit|preventDefault={async () => {
                 let joinGameId = joinGameIdOrLink.trim();
                 {
                   // if it is a link, get the ID
