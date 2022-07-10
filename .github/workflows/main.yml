@@ -24,4 +24,6 @@ jobs:
         run: yarn install
 
       - name: Deploy
+        env:
+          VITE_FIREBASE_CONFIG: ${{ secrets.VITE_FIREBASE_CONFIG }}
         run: yarn deploy
