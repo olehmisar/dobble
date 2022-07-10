@@ -6,7 +6,7 @@ Code is a mess but it is good enough. Stack: firebase + svelte.
 
 ## Host a copy
 
-Copy "env.example.ts" to "env.ts" and paste your firebase config there.
+Copy ".env.example" to ".env" and paste your firebase config there.
 
 Install dependencies:
 
@@ -17,6 +17,5 @@ yarn
 Change surge.sh domain in "package.json#scripts.deploy" script and run:
 
 ```sh
-yarn build
 yarn deploy
 ```
