@@ -97,7 +97,7 @@
     </p>
     <p>Results:</p>
     <ul>
-      {#each players as player (player.playerId)}
+      {#each _.orderBy(players, (p) => -p.cards.length) as player (player.playerId)}
         <li>
           {$playerId2Username[player.playerId]} - {player.cards.length} cards
         </li>
