@@ -128,7 +128,7 @@
                 in:moveAnimationReceive={{ key: card.id }}
                 out:moveAnimationSend={{ key: card.id }}
               >
-                <Card pics={card.pics} />
+                <Card pics={card.pics} disabled={player.lastMoveWasWrong} />
               </div>
             {/each}
           </div>
