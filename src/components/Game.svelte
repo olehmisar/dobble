@@ -77,7 +77,7 @@
   {#if !$gameState.players[myPlayerId]}
     <button on:click={joinGame}>Join game</button>
   {:else}
-    <button on:click={leaveGame}>Leave game</button>
+    <button on:click={leaveGame} class="secondary">Leave game</button>
   {/if}
   <button
     disabled={$gameState.tag === "waiting" &&

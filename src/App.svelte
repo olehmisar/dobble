@@ -1,9 +1,9 @@
 <script lang="ts">
+  import { Route, Router, links, navigate } from "svelte-routing";
   import Game from "./components/Game.svelte";
-  import { myPlayerId, username } from "./stores/user-store";
   import UsernameForm from "./components/UsernameForm.svelte";
-  import { Router, Route, links, navigate } from "svelte-routing";
   import { sha256 } from "./shared/utils";
+  import { myPlayerId, username } from "./stores/user-store";
 
   let showUsernameForm = false;
 
@@ -14,25 +14,30 @@
 </script>
 
 <div use:links>
-  <header style="display: flex; gap: 1rem">
+  <header
+    style="display: flex; gap: 1rem; margin-bottom: 1rem;"
+    class="container"
+  >
     <a href="/" style="font-size: 2rem;">Dobble</a>
     <div style="flex-grow: 1" />
     <div>
       {$username}
       <button
+        class="secondary"
         on:click={() => {
           showUsernameForm = !showUsernameForm;
         }}>Change username</button
       >
     </div>
   </header>
-
   {#if !$username || showUsernameForm}
-    <UsernameForm
-      on:change={() => {
-        showUsernameForm = false;
-      }}
-    />
+    <section class="container">
+      <UsernameForm
+        on:change={() => {
+          showUsernameForm = false;
+        }}
+      />
+    </section>
   {/if}
 
   {#if $username}
@@ -41,54 +46,62 @@
     {:else}
       <Router>
         <Route path="/play/:gameId" let:params>
-          <Game myPlayerId={$myPlayerId} gameId={params.gameId || ""} />
+          <main class="container">
+            <Game myPlayerId={$myPlayerId} gameId={params.gameId || ""} />
+          </main>
         </Route>
         <Route>
-          <center>
-            <form
-              on:submit|preventDefault={() => {
-                const newGameId = sha256(Math.random())
-                  .toString(16)
-                  .slice(0, 8);
-                createOrJoinGame(newGameId);
-              }}
-            >
-              <h3>Create a game</h3>
-              <button>Create</button>
-            </form>
-            <form
-              on:submit|preventDefault={async () => {
-                let joinGameId = joinGameIdOrLink.trim();
-                {
-                  // if it is a link, get the ID
-                  const startPattern = "/play/";
-                  const startIndex = joinGameId.indexOf(startPattern);
-                  if (startIndex !== -1) {
-                    joinGameId = joinGameId.slice(
-                      startIndex + startPattern.length
-                    );
-                    const endPattern = "/";
-                    const endIndex = joinGameId.indexOf(endPattern);
-                    if (endIndex !== -1) {
-                      joinGameId = joinGameId.slice(0, endIndex);
+          <center class="container">
+            <article>
+              <form
+                on:submit|preventDefault={() => {
+                  const newGameId = sha256(Math.random())
+                    .toString(16)
+                    .slice(0, 8);
+                  createOrJoinGame(newGameId);
+                }}
+              >
+                <h3>Create a game</h3>
+                <button>Create</button>
+              </form>
+            </article>
+
+            <hr />
+            OR
+            <hr />
+
+            <article>
+              <form
+                on:submit|preventDefault={async () => {
+                  let joinGameId = joinGameIdOrLink.trim();
+                  {
+                    // if it is a link, get the ID
+                    const startPattern = "/play/";
+                    const startIndex = joinGameId.indexOf(startPattern);
+                    if (startIndex !== -1) {
+                      joinGameId = joinGameId.slice(
+                        startIndex + startPattern.length,
+                      );
+                      const endPattern = "/";
+                      const endIndex = joinGameId.indexOf(endPattern);
+                      if (endIndex !== -1) {
+                        joinGameId = joinGameId.slice(0, endIndex);
+                      }
                     }
                   }
-                }
-                createOrJoinGame(joinGameId);
-              }}
-            >
-              <hr />
-              OR
-              <hr />
-              <div>
-                <h3>Join already existing game</h3>
+                  createOrJoinGame(joinGameId);
+                }}
+              >
                 <div>
-                  Room ID or room link:
-                  <input bind:value={joinGameIdOrLink} />
+                  <h3>Join already existing game</h3>
+                  <div>
+                    Room ID or room link:
+                    <input bind:value={joinGameIdOrLink} />
+                  </div>
+                  <button>Join</button>
                 </div>
-                <button>Join</button>
-              </div>
-            </form>
+              </form>
+            </article>
           </center>
         </Route>
       </Router>
